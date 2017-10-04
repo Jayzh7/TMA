@@ -29,7 +29,6 @@
         <activity
             android:name=".Activities.AddEventActivity"
             android:label="New event" />
-
         <activity
             android:name=".Activities.MapsActivity"
             android:label="@string/title_activity_maps" />
@@ -45,6 +44,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+
+        <activity
+            android:name=".Activities.NaviActivity"
+            android:label="@string/title_activity_navi"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

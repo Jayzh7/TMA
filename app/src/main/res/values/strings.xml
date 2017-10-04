@@ -23,4 +23,12 @@
     <string name="cancel">Cancel</string>
     <string name="map_key">AIzaSyCXseBewC5JnycCXt66nTt0Zj-YNE-Za-s</string>
     <string name="please_fill_out_all_blanks">Please fill out all blanks</string>
+    <string name="title_activity_navi">NaviActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="past_journey">Past Journey</string>
+    <string name="planning_journey">Planning journey</string>
+    <string name="weather_reminder">Weather reminder</string>
+    <string name="travel_manager">Travel Manager</string>
 </resources>
