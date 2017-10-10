@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.jayzh7.tma"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -32,9 +32,9 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     compile 'joda-time:joda-time:2.9.9'
     compile 'com.jude:swipebackhelper:3.1.2'
+    compile project(path: ':MPChartLib')
 }
 
 

@@ -12,7 +12,7 @@
     <com.github.mikephil.charting.charts.HorizontalBarChart
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/chart">
+        android:id="@+id/chart2">
 
     </com.github.mikephil.charting.charts.HorizontalBarChart>
 </android.support.constraint.ConstraintLayout>

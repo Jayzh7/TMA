@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
@@ -20,25 +21,32 @@ import android.widget.TextView;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.jayzh7.tma.Database.DatabaseHelper;
+import com.jayzh7.tma.Models.TravelEvent;
 import com.jayzh7.tma.R;
 import com.jayzh7.tma.Utils.MyPlacePicker;
 import com.jayzh7.tma.Utils.MyTimePicker;
 import com.jude.swipbackhelper.SwipeBackHelper;
 
+import org.joda.time.DateTime;
+
 public class AddEventActivity extends AppCompatActivity {
 
-    public static final int sPLACE_PICKER_REQUEST_CODE_0 = 1;
-    public static final int sPLACE_PICKER_REQUEST_CODE_1 = 2;
+    public static final int PLACE_PICKER_REQUEST_CODE_0 = 1;
+    public static final int PLACE_PICKER_REQUEST_CODE_1 = 2;
+    public static final int MINUTES_IN_A_DAY = 1440;
 
+    private static final String sMissingInfo = "Please fill out all the blanks";
+    private static final String sTimeConfict = "The time period that you've chosen is not available";
+    private static final String sInvalidTime = "Please input valid start time and end time";
+    private EditText mEventName;
     private TextView mStartTimeTV;
     private TextView mEndTimeTV;
 
     private TextView mStartPlaceTV;
     private TextView mEndPlaceTV;
     private Spinner mSpinner;
-
 
     private MyTimePicker mStartTimePicker;
     private MyTimePicker mEndTimePicker;
@@ -47,8 +55,9 @@ public class AddEventActivity extends AppCompatActivity {
     private LinearLayout mLinearLayout;
     private Activity thisActivity;
 
+    private DatabaseHelper mDB;
     private PopupWindow mPopupWindow;
-
+    private TextView mPopupText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,27 +67,43 @@ public class AddEventActivity extends AppCompatActivity {
         thisActivity = this;
         findViews();
 
+        mDB = DatabaseHelper.getInstance(this);
+
         LayoutInflater inflater = (LayoutInflater) thisActivity.getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popup_window, null);
         mPopupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
+        mPopupText = popupView.findViewById(R.id.popupTV);
 
         mStartTimePicker = new MyTimePicker(thisActivity, mStartTimeTV);
         mEndTimePicker = new MyTimePicker(thisActivity, mEndTimeTV);
 
-        mStartPlacePicker = new MyPlacePicker(thisActivity, mStartPlaceTV, sPLACE_PICKER_REQUEST_CODE_0);
-        mEndPlacePicker = new MyPlacePicker(thisActivity, mEndPlaceTV, sPLACE_PICKER_REQUEST_CODE_1);
+        mStartPlacePicker = new MyPlacePicker(thisActivity, mStartPlaceTV, PLACE_PICKER_REQUEST_CODE_0);
+        mEndPlacePicker = new MyPlacePicker(thisActivity, mEndPlaceTV, PLACE_PICKER_REQUEST_CODE_1);
+
+        testInput();
 
         initSpinner();
     }
 
+    private void testInput() {
+        mStartTimePicker.testInput(10, 20);
+        mEndTimePicker.testInput(10, 40);
+
+        mStartPlacePicker.testInput();
+        mStartPlacePicker.testInput();
+
+        mEventName.setText("test");
+    }
+
     private void findViews() {
-        mStartTimeTV = (TextView) findViewById(R.id.startTimeTV);
-        mEndTimeTV = (TextView) findViewById(R.id.endTimeTV);
-        mSpinner = (Spinner) findViewById(R.id.eTSpinner);
+        mStartTimeTV = findViewById(R.id.startTimeTV);
+        mEndTimeTV = findViewById(R.id.endTimeTV);
+        mSpinner = findViewById(R.id.eTSpinner);
         mStartPlaceTV = findViewById(R.id.startPlaceTV);
         mEndPlaceTV = findViewById(R.id.endPlaceTV);
         mLinearLayout = findViewById(R.id.linearLayout);
+        mEventName = findViewById(R.id.eventNameET);
     }
 
     /**
@@ -93,14 +118,13 @@ public class AddEventActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == sPLACE_PICKER_REQUEST_CODE_1 ||
-                requestCode == sPLACE_PICKER_REQUEST_CODE_0) {
+        if (requestCode == PLACE_PICKER_REQUEST_CODE_1 ||
+                requestCode == PLACE_PICKER_REQUEST_CODE_0) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(this, data);
-                LatLng latLng = place.getLatLng();
                 LatLngBounds latLngBounds = PlacePicker.getLatLngBounds(data);
 
-                if (requestCode == sPLACE_PICKER_REQUEST_CODE_1) {
+                if (requestCode == PLACE_PICKER_REQUEST_CODE_1) {
                     mEndPlacePicker.setBounds(latLngBounds);
                     mEndPlacePicker.setText(place.getName());
                     mEndPlacePicker.setPlaceID(place.getId());
@@ -111,9 +135,8 @@ public class AddEventActivity extends AppCompatActivity {
                     mStartPlacePicker.setPlaceID(place.getId());
                     mEndPlacePicker.setBounds(latLngBounds);
                 }
-                Log.i("ONRESULT", "Place: " + place.getId());
             } else if (resultCode == RESULT_CANCELED) {
-                Log.i("ONRESULT", "Canceled");
+                Log.i("MYLOGTAG", "Canceled");
             }
         }
     }
@@ -133,19 +156,29 @@ public class AddEventActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.add_save) {
-            if (mStartPlacePicker.checkValidity() && mEndPlacePicker.checkValidity()) {
-                if (mStartTimePicker.checkValidity() && mEndTimePicker.checkValidity()) {
-                    // save data to database
-                } else {
-                    // TODO  point out what is missing
-                    // TODO　refactor this segment
+            if (mStartPlacePicker.checkValidity() && mEndPlacePicker.checkValidity()
+                    && mStartTimePicker.checkValidity() && mEndTimePicker.checkValidity()) {
+                if (getMinOfDateTime(mStartTimePicker.getDateTime()) < getMinOfDateTime(mEndTimePicker.getDateTime())) {
+                    if (checkTimeValidity()) {
+                        // save data to database
+                        mDB.insertTravelEvent(new TravelEvent(
+                                mEventName.getText().toString(),
+                                mStartTimePicker.getDateTime(),
+                                mEndTimePicker.getDateTime(),
+                                mStartPlacePicker.getPlaceID(),
+                                mEndPlacePicker.getPlaceID()));
+                        this.finish();
+                    } else {
+                        mPopupText.setText(sTimeConfict);
 
-                    mPopupWindow.showAtLocation(mLinearLayout, Gravity.CENTER, 0, 0);
+                    }
+                } else {
+                    mPopupText.setText(sInvalidTime);
                 }
             } else {
-                mPopupWindow.showAtLocation(mLinearLayout, Gravity.CENTER, 0, 0);
+                mPopupText.setText(sMissingInfo);
             }
-
+            mPopupWindow.showAtLocation(mLinearLayout, Gravity.CENTER, 0, 0);
             return true;
         }
 
@@ -154,6 +187,11 @@ public class AddEventActivity extends AppCompatActivity {
 
     public void onClickCancel(View v) {
         mPopupWindow.dismiss();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -168,5 +206,28 @@ public class AddEventActivity extends AppCompatActivity {
         SwipeBackHelper.onDestroy(this);
     }
 
+    /**
+     * Check if the time period users have chosen is available
+     *
+     * @return true available
+     */
+    private boolean checkTimeValidity() {
+        // Retrieve data from database
+        int[] array = mDB.readForTimeLine();
 
+        DateTime start = mStartTimePicker.getDateTime();
+        DateTime end = mEndTimePicker.getDateTime();
+        Boolean available = true;
+        for (int i = getMinOfDateTime(start); i < getMinOfDateTime(end); i++) {
+            if (array[i] != 1) {
+                available = false;
+                break;
+            }
+        }
+        return available;
+    }
+
+    private int getMinOfDateTime(DateTime dateTime) {
+        return dateTime.getHourOfDay() * 60 + dateTime.getMinuteOfHour();
+    }
 }

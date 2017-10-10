@@ -38,6 +38,7 @@ public class MyTimePicker {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
                         mTextView.setText(hour + ":" + minute);
+                        mTime = new DateTime(mTime.getYear(), mTime.getMonthOfYear(), mTime.getDayOfMonth(), hour, minute, 0, 0);
                     }
                 }, mTime.getHourOfDay(), mTime.getMinuteOfHour(), true);
                 validity = true;
@@ -45,6 +46,15 @@ public class MyTimePicker {
                 timePickerDialog.show();
             }
         });
+    }
+
+    public void testInput(int hour, int minute) {
+        mTime = new DateTime(2017, 10, 8, hour, minute, 0, 0);
+        validity = true;
+    }
+
+    public DateTime getDateTime() {
+        return mTime;
     }
 
     public boolean checkValidity() {

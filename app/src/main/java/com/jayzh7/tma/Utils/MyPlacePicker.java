@@ -15,8 +15,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
  */
 
 public class MyPlacePicker {
-
-    private static final String sPREFIX = "origin=place_id:";
     // 1 represents for end place, 0 represents for start place
     private int mCode;
     private Activity mContext;
@@ -37,6 +35,10 @@ public class MyPlacePicker {
         mTextView.setText(string);
     }
 
+    public void testInput() {
+        validity = true;
+    }
+
     public void setBounds(LatLngBounds bounds) {
         mBounds = bounds;
     }
@@ -47,7 +49,7 @@ public class MyPlacePicker {
     }
 
     public String getPlaceID() {
-        return sPREFIX + mPlaceID;
+        return mPlaceID;
     }
 
     public boolean checkValidity() {
@@ -62,9 +64,7 @@ public class MyPlacePicker {
                     PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
                     if (mBounds != null) intentBuilder.setLatLngBounds(mBounds);
                     mContext.startActivityForResult(intentBuilder.build(mContext), mCode);
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesRepairableException e) {
+                } catch (GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException e) {
                     e.printStackTrace();
                 }
             }
