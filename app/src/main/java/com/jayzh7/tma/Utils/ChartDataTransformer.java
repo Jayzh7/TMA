@@ -23,6 +23,10 @@ public class ChartDataTransformer {
         return mEntryData;
     }
 
+    public int getMin() {
+        return mMinTime;
+    }
+
     private void transform(int[] mChartData) {
         calcMinMax();
         for (int i = 2; i < mChartData[0]; i += 3) {
