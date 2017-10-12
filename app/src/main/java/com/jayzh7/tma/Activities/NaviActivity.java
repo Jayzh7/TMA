@@ -9,7 +9,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +23,7 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.jayzh7.tma.Database.DatabaseHelper;
+import com.jayzh7.tma.Listener.BarChartListener;
 import com.jayzh7.tma.R;
 import com.jayzh7.tma.Utils.ChartDataTransformer;
 
@@ -56,13 +56,15 @@ public class NaviActivity extends AppCompatActivity
         });
 
         mChart = findViewById(R.id.chart);
-
         setChart();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        mChart.setOnChartGestureListener(new BarChartListener(NaviActivity.this, mChart));
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -110,35 +112,16 @@ public class NaviActivity extends AppCompatActivity
 
         mChart.setMaxVisibleValueCount(60);
         mChart.setPinchZoom(true);
+        mChart.setDoubleTapToZoomEnabled(false);
 
         mChart.setDrawGridBackground(false);
-
-        XAxis xl = mChart.getXAxis();
-        xl.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xl.setDrawAxisLine(true);
-        xl.setDrawGridLines(false);
-        xl.setGranularity(10f);
-
-        YAxis yl = mChart.getAxisLeft();
-        yl.setDrawAxisLine(true);
-        yl.setDrawGridLines(true);
-        yl.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-//        yl.setInverted(true);
-
-        YAxis yr = mChart.getAxisRight();
-        yr.setDrawAxisLine(true);
-        yr.setDrawGridLines(false);
-        yr.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-        yr.setInverted(true);
-
+        mChart.setHighlightPerTapEnabled(false);
 
         setData();
         mChart.setFitBars(true);
         mChart.animateY(2500);
         mChart.setHighlightFullBarEnabled(false);
 
-//        BarChartListener barChartListener = new BarChartListener(mChart);
-//        mChart.setOnTouchListener(barChartListener);
         Legend l = mChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
@@ -158,12 +141,33 @@ public class NaviActivity extends AppCompatActivity
         int[] chartData = db.readForBarCharts();
 
         ChartDataTransformer transformer = new ChartDataTransformer(chartData);
-
         int[] entryData = transformer.getTransformedData();
 
+        XAxis xl = mChart.getXAxis();
+        xl.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xl.setDrawAxisLine(true);
+        xl.setDrawGridLines(false);
+        xl.setGranularity(10f);
+
+        YAxis yl = mChart.getAxisLeft();
+        yl.setDrawAxisLine(true);
+        yl.setDrawGridLines(true);
+        yl.resetAxisMinimum();
+        yl.setTimeOffset(transformer.getMin());
+        yl.setAxisMinimum(0f);
+
+        YAxis yr = mChart.getAxisRight();
+        yr.setDrawAxisLine(true);
+        yr.setDrawGridLines(false);
+        yr.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
         for (int i = 2, j = 0; i < entryData[0]; i += 3, j++) {
-            entries.add(new BarEntry(i, entryData[i], entryData[i + 1] - entryData[i], getResources().getDrawable(R.drawable.side_nav_bar)));
-            Log.d("MYLOGTAG", "ID:" + j + " start:" + entryData[i] + " end:" + entryData[i + 1]);
+            entries.add(new BarEntry(
+                    entryData[i - 1],                     // ID
+                    (i + 1) / 3,                         // display order
+                    entryData[i],                       // Start time (transformed)
+                    entryData[i + 1] - entryData[i], // End time   (transformed)
+                    getResources().getDrawable(R.drawable.side_nav_bar)));
         }
 
         BarDataSet set;
@@ -189,6 +193,7 @@ public class NaviActivity extends AppCompatActivity
         }
     }
 
+    // TODO mChart -> mRenderer -> mBarBuffers
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -201,7 +206,12 @@ public class NaviActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         setChart();
-        Log.d("MYLOGTAG", "on Resume main");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
     }
 
     @Override

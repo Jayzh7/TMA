@@ -62,6 +62,15 @@ public class YAxis extends AxisBase {
      * the position of the y-labels relative to the chart
      */
     private YAxisLabelPosition mPosition = YAxisLabelPosition.OUTSIDE_CHART;
+    private int mTimeOffset;
+
+    public void setTimeOffset(int timeOffset) {
+        this.mTimeOffset = timeOffset;
+    }
+
+    public int getTimeOffset() {
+        return this.mTimeOffset;
+    }
 
     /**
      * enum for the position of the y-labels relative to the chart

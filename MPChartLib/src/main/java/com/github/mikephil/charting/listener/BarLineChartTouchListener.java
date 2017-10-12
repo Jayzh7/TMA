@@ -602,8 +602,6 @@ public class BarLineChartTouchListener extends ChartTouchListener<BarLineChartBa
             l.onChartLongPressed(e);
         }
 
-        //TODO add update item here
-        // Figure out how highlight is done
     }
 
     @Override

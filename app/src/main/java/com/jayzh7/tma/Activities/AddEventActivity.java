@@ -38,7 +38,7 @@ public class AddEventActivity extends AppCompatActivity {
     public static final int MINUTES_IN_A_DAY = 1440;
 
     private static final String sMissingInfo = "Please fill out all the blanks";
-    private static final String sTimeConfict = "The time period that you've chosen is not available";
+    private static final String sTimeConflict = "The time period that you've chosen is not available";
     private static final String sInvalidTime = "Please input valid start time and end time";
     private EditText mEventName;
     private TextView mStartTimeTV;
@@ -67,6 +67,7 @@ public class AddEventActivity extends AppCompatActivity {
         thisActivity = this;
         findViews();
 
+
         mDB = DatabaseHelper.getInstance(this);
 
         LayoutInflater inflater = (LayoutInflater) thisActivity.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -81,9 +82,12 @@ public class AddEventActivity extends AppCompatActivity {
         mStartPlacePicker = new MyPlacePicker(thisActivity, mStartPlaceTV, PLACE_PICKER_REQUEST_CODE_0);
         mEndPlacePicker = new MyPlacePicker(thisActivity, mEndPlaceTV, PLACE_PICKER_REQUEST_CODE_1);
 
-        testInput();
-
         initSpinner();
+        if (getIntent() == null)
+            testInput();
+        else
+            mEventName.setText("Not null");
+
     }
 
     private void testInput() {
@@ -161,15 +165,17 @@ public class AddEventActivity extends AppCompatActivity {
                 if (getMinOfDateTime(mStartTimePicker.getDateTime()) < getMinOfDateTime(mEndTimePicker.getDateTime())) {
                     if (checkTimeValidity()) {
                         // save data to database
-                        mDB.insertTravelEvent(new TravelEvent(
-                                mEventName.getText().toString(),
-                                mStartTimePicker.getDateTime(),
-                                mEndTimePicker.getDateTime(),
-                                mStartPlacePicker.getPlaceID(),
-                                mEndPlacePicker.getPlaceID()));
+                        mDB.insertTravelEvent(
+                                new TravelEvent(
+                                        mEventName.getText().toString(),
+                                        mStartTimePicker.getDateTime(),
+                                        mEndTimePicker.getDateTime(),
+                                        mStartPlacePicker.getPlaceID(),
+                                        mEndPlacePicker.getPlaceID())
+                        );
                         this.finish();
                     } else {
-                        mPopupText.setText(sTimeConfict);
+                        mPopupText.setText(sTimeConflict);
 
                     }
                 } else {

@@ -14,6 +14,10 @@ import com.github.mikephil.charting.highlight.Range;
 public class BarEntry extends Entry {
 
     /**
+     * Id of the entry, database related
+     */
+    private int mID;
+    /**
      * Offset value on Y axis
      */
     private float mOffsetY;
@@ -72,6 +76,21 @@ public class BarEntry extends Entry {
      */
     public BarEntry(float x, float y, Drawable icon) {
         super(x, y, icon);
+    }
+
+    /**
+     * Constructor for bars with offset on X axis
+     *
+     * @param ID
+     * @param x
+     * @param offsetY
+     * @param y
+     * @param icon
+     */
+    public BarEntry(int ID, float x, float offsetY, float y, Drawable icon) {
+        super(x, y + offsetY, icon);
+        mID = ID;
+        this.mOffsetY = offsetY;
     }
 
     /**

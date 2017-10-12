@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.buffer.BarBuffer;
@@ -181,7 +182,7 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         float bottom = y2;
 
         mBarRect.set(left, top, right, bottom);
-
+        Log.d("PREHIGHLIGHT", " " + left + " " + right + " " + top + " " + bottom);
         trans.rectToPixelPhase(mBarRect, mAnimator.getPhaseY());
     }
 
@@ -480,5 +481,9 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
     @Override
     public void drawExtras(Canvas c) {
+    }
+
+    public BarBuffer[] getBuffer() {
+        return mBarBuffers;
     }
 }

@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint.Align;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.buffer.BarBuffer;
@@ -48,6 +49,7 @@ public class HorizontalBarChartRenderer extends BarChartRenderer {
             mBarBuffers[i] = new HorizontalBarBuffer(set.getEntryCount() * 4 * (set.isStacked() ? set.getStackSize() : 1),
                     barData.getDataSetCount(), set.isStacked());
         }
+
     }
 
     private RectF mBarShadowRectBuffer = new RectF();
@@ -411,7 +413,7 @@ public class HorizontalBarChartRenderer extends BarChartRenderer {
         float right = y2;
 
         mBarRect.set(left, top, right, bottom);
-
+        Log.d("PREHIGHLIGHT", " " + left + " " + right + " " + top + " " + bottom);
         trans.rectToPixelPhaseHorizontal(mBarRect, mAnimator.getPhaseY());
     }
 

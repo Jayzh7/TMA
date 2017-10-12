@@ -30,6 +30,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_END_PLACE_ID = "EndPlaceID";
 
     public static final int DATABASE_VERSION = 3;
+    public static final String COLUMN_LEFT = "left";
+    public static final String COLUMN_RIGHT = "right";
+    public static final String COLUMN_TOP = "top";
+    public static final String COLUMN_BOTTOM = "bottom";
 
     private static DatabaseHelper sInstance;
 
@@ -65,7 +69,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_END_PLACE_ID + " VARCHAR, "
                 + COLUMN_START_TIME + " INTEGER, "
                 + COLUMN_END_TIME + " INTEGER, "
-                + COLUMN_DURATION + " INTEGER);");
+                + COLUMN_DURATION + " INTEGER, "
+                + COLUMN_LEFT + " INTEGER, "
+                + COLUMN_RIGHT + " INTEGER, "
+                + COLUMN_TOP + " INTEGER, "
+                + COLUMN_BOTTOM + " INTEGER);");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_TIME + " ( "
                 + COLUMN_ID + " INTEGER,"
@@ -133,13 +141,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    /**
+     * Update the item's painted area
+     *
+     * @param id     id of the item
+     * @param left   leftest point
+     * @param right  rightest point
+     * @param top    top point
+     * @param bottom bottom point
+     */
+    public void updatePosition(int id, int left, int right, int top, int bottom) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_LEFT, left);
+        values.put(COLUMN_RIGHT, right);
+        values.put(COLUMN_TOP, top);
+        values.put(COLUMN_BOTTOM, bottom);
+
+        int i = db.update(TABLE_EVENTS, values, COLUMN_ID + "=" + id, null);
+        Log.d("UPDATESQL", String.valueOf(i));
+    }
+
     public int[] readForBarCharts() {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String[] projection = {
                 COLUMN_ID,
                 COLUMN_START_TIME,
-
                 COLUMN_END_TIME,
         };
 
