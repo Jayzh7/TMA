@@ -40,7 +40,7 @@ public class EventsListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         mRecyclerView = getView().findViewById(R.id.recyclerView);
-        mAdapter = new TravelEventAdapter(DatabaseHelper.getInstance(getActivity()).readForEventList());
+        mAdapter = new TravelEventAdapter(getActivity(), DatabaseHelper.getInstance(getActivity()).readForEventList());
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
@@ -51,6 +51,12 @@ public class EventsListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        refreshView();
+    }
+
+    private void refreshView() {
+        mAdapter = new TravelEventAdapter(getActivity(), DatabaseHelper.getInstance(getActivity()).readForEventList());
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override

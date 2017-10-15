@@ -38,6 +38,7 @@ public class MyPlacePicker {
 
     public void setPlaceName(String placeName) {
         mPlaceName = placeName;
+        validity = true;
     }
 
     public String getPlaceName() {

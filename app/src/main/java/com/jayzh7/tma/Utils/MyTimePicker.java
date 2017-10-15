@@ -52,6 +52,21 @@ public class MyTimePicker {
         validity = true;
     }
 
+    public void setTime(int hour, int minute) {
+        mTime = new DateTime(mTime.getYear(), mTime.getMonthOfYear(), mTime.getDayOfMonth(), hour, minute, 0, 0);
+        validity = true;
+    }
+
+    public void setTime(DateTime time) {
+        mTime = time;
+        validity = true;
+    }
+
+    public void setTime(int minutes) {
+        mTime = new DateTime(mTime.getYear(), mTime.getMonthOfYear(), mTime.getDayOfMonth(), minutes / 60, minutes % 60, 0, 0);
+        validity = true;
+    }
+
     public DateTime getDateTime() {
         return mTime;
     }

@@ -26,11 +26,15 @@ import com.jayzh7.tma.Database.DatabaseHelper;
 import com.jayzh7.tma.Models.EventType;
 import com.jayzh7.tma.Models.TravelEvent;
 import com.jayzh7.tma.R;
+import com.jayzh7.tma.Utils.DateTimeConverter;
 import com.jayzh7.tma.Utils.MyPlacePicker;
 import com.jayzh7.tma.Utils.MyTimePicker;
+import com.jayzh7.tma.Utils.TravelEventAdapter;
 import com.jude.swipbackhelper.SwipeBackHelper;
 
 import org.joda.time.DateTime;
+
+import java.io.Serializable;
 
 public class AddEventActivity extends AppCompatActivity {
 
@@ -41,12 +45,15 @@ public class AddEventActivity extends AppCompatActivity {
     private static final String sMissingInfo = "Please fill out all the blanks";
     private static final String sTimeConflict = "The time period that you've chosen is not available";
     private static final String sInvalidTime = "Please input valid start time and end time";
+
     private EditText mEventNameET;
+
     private TextView mStartTimeTV;
     private TextView mEndTimeTV;
 
     private TextView mStartPlaceTV;
     private TextView mEndPlaceTV;
+
     private Spinner mSpinner;
     private EventType mType;
 
@@ -54,6 +61,7 @@ public class AddEventActivity extends AppCompatActivity {
     private MyTimePicker mEndTimePicker;
     private MyPlacePicker mStartPlacePicker;
     private MyPlacePicker mEndPlacePicker;
+
     private LinearLayout mLinearLayout;
     private Activity thisActivity;
 
@@ -61,7 +69,10 @@ public class AddEventActivity extends AppCompatActivity {
     private PopupWindow mPopupWindow;
     private TextView mPopupText;
 
-    @Override
+    // These variables are used to identify a edit event or a new event
+    private boolean mNewEvent;
+    private int mId;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SwipeBackHelper.onCreate(this);
@@ -85,12 +96,38 @@ public class AddEventActivity extends AppCompatActivity {
         mEndPlacePicker = new MyPlacePicker(thisActivity, mEndPlaceTV, PLACE_PICKER_REQUEST_CODE_1);
 
         initSpinner();
-        if (getIntent() == null)
+
+        Intent intent = getIntent();
+        mId = intent.getIntExtra(TravelEventAdapter.START_TIME, 0);
+        if (mId != 0) {
+            setInput(intent.getSerializableExtra(TravelEventAdapter.TRAVEL_EVENT));
+            mNewEvent = false;
+        } else {
+            mNewEvent = true;
             testInput();
-        else
-            mEventNameET.setText("Not null");
+        }
 
     }
+
+    private void setInput(Serializable serializableExtra) {
+        TravelEvent event = (TravelEvent) serializableExtra;
+
+        mEventNameET.setText(event.getEventName());
+
+        mSpinner.setSelection(event.getEventType().ordinal());
+
+        mStartTimeTV.setText(new DateTimeConverter(event.getStartT()).getConvertedTime());
+        mEndTimeTV.setText(new DateTimeConverter(event.getEndT()).getConvertedTime());
+
+        mStartTimePicker.setTime(event.getStartT());
+        mEndTimePicker.setTime(event.getEndT());
+
+        mStartPlacePicker.setText(event.getFromPlace());
+        mEndPlacePicker.setText(event.getToPlace());
+        mStartPlacePicker.setPlaceName(event.getFromPlace());
+        mEndPlacePicker.setPlaceName(event.getToPlace());
+    }
+
 
     private void testInput() {
         mStartTimePicker.testInput(10, 20);
@@ -164,11 +201,17 @@ public class AddEventActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.add_save) {
+            if (!mNewEvent) {
+                // Update event: delete old event and clear time line
+                mDB.deleteEvent(mId);
+            }
+
             if (mStartPlacePicker.checkValidity() && mEndPlacePicker.checkValidity()
                     && mStartTimePicker.checkValidity() && mEndTimePicker.checkValidity()) {
                 if (getMinOfDateTime(mStartTimePicker.getDateTime()) < getMinOfDateTime(mEndTimePicker.getDateTime())) {
                     if (checkTimeValidity()) {
                         // save data to database
+                        // Add a new event to database
                         mDB.insertTravelEvent(
                                 new TravelEvent(
                                         mEventNameET.getText().toString(),
@@ -191,7 +234,9 @@ public class AddEventActivity extends AppCompatActivity {
             } else {
                 mPopupText.setText(sMissingInfo);
             }
+
             mPopupWindow.showAtLocation(mLinearLayout, Gravity.CENTER, 0, 0);
+
             return true;
         }
 

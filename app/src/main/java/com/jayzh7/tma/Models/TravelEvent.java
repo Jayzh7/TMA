@@ -2,11 +2,13 @@ package com.jayzh7.tma.Models;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
+
 /**
  * Created by Jay on 10/8/2017.
  */
 
-public class TravelEvent {
+public class TravelEvent implements Serializable {
     private DateTime mStartTime;
     private int mStartT;
     private int mEndT;
@@ -43,13 +45,6 @@ public class TravelEvent {
         mEndPlace = endPlace;
         mEventType = eventType;
         calcDuration();
-    }
-
-    public TravelEvent(String startPlace, String endPlace, DateTime startTime, DateTime endTime) {
-        mStartTime = startTime;
-        mEndTime = endTime;
-        mFromPlace = startPlace;
-        mEndPlace = endPlace;
     }
 
     public TravelEvent(String name, String startPlace, String endPlace, int startTime, int endTime, int eventType) {

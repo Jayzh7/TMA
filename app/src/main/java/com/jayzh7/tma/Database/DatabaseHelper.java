@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 
 /**
- *
+ * This database helper is used to do all the read, write for database
  * Created by Jay on 10/4/2017.
  */
 
@@ -33,7 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_START_PLACE_NAME = "StartPlaceName";
     public static final String COLUMN_END_PLACE_NAME = "EndPlaceName";
 
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 7;
     public static final String COLUMN_LEFT = "left";
     public static final String COLUMN_RIGHT = "right";
     public static final String COLUMN_TOP = "top";
@@ -41,6 +41,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper sInstance;
 
+    /**
+     * public contructor
+     *
+     * @param context
+     * @param name
+     * @param factory
+     * @param version
+     */
     public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
@@ -64,6 +72,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    /**
+     * Create a new database upon creation.
+     * @param sqLiteDatabase the database where data will be stored
+     */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_EVENTS + " ( "
@@ -98,6 +110,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
+    /**
+     * Insert a new event to database
+     * @param travelEvent new event
+     * @return
+     */
     public long insertTravelEvent(TravelEvent travelEvent) {
         SQLiteDatabase database = this.getWritableDatabase();
 
@@ -118,13 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long id = database.insert(TABLE_EVENTS, null, values);
 
-        ContentValues values1 = new ContentValues();
-        values1.put(COLUMN_AVAILABLE, 0);
-
-        String whereArgs = "";
-        for (int i = 0; i < endTime - startTime; i++) {
-            int j = database.update(TABLE_TIME, values1, COLUMN_ID + "=?", new String[]{String.valueOf(startTime + i)});
-        }
+        updateTimeLine(startTime, endTime, false);
 
         return id;
     }
@@ -150,6 +161,90 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int i = db.update(TABLE_EVENTS, values, COLUMN_ID + "=" + id, null);
     }
 
+    /**
+     * Update an event
+     *
+     * @param startTime start time of the event which is used to identify which event to update
+     * @param event     new event
+     */
+    public void updateEvent(int startTime, TravelEvent event) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_EVENT_NAME, event.getEventName());
+        values.put(COLUMN_EVENT_TYPE, event.getEventType().ordinal());
+        values.put(COLUMN_START_TIME, event.getStartT());
+        values.put(COLUMN_END_TIME, event.getEndT());
+        values.put(COLUMN_START_PLACE_NAME, event.getFromPlace());
+        values.put(COLUMN_END_PLACE_NAME, event.getToPlace());
+        values.put(COLUMN_START_PLACE_ID, event.getStartPlaceID());
+        values.put(COLUMN_END_PLACE_ID, event.getEndPlaceID());
+
+        db.update(TABLE_EVENTS, values, COLUMN_START_TIME + "=" + startTime, null);
+    }
+
+    /**
+     * Clear or set if the minute is available
+     *
+     * @param start start minute
+     * @param end   end minute
+     * @param clear true:  clear
+     *              false: set
+     */
+    public void updateTimeLine(int start, int end, boolean clear) {
+        if (start > end)
+            return;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        if (clear)
+            values.put(COLUMN_AVAILABLE, 1);
+        else
+            values.put(COLUMN_AVAILABLE, 0);
+
+        for (int i = start; i <= end; i++)
+            db.update(TABLE_TIME, values, COLUMN_ID + "=" + i, null);
+    }
+
+    /**
+     * Delete an event in database, also clear the time period it occupies.
+     *
+     * @param id start time used to identify which item to delete
+     */
+    public void deleteEvent(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int endTime = 0;
+
+        String[] projection = {
+                COLUMN_END_TIME,
+        };
+
+        Cursor cursor = db.query(
+                TABLE_EVENTS,
+                projection,
+                COLUMN_START_TIME + "=" + id,
+                null,
+                null,
+                null,
+                null
+        );
+
+        while (cursor.moveToNext()) {
+            endTime = cursor.getInt(
+                    cursor.getColumnIndexOrThrow(COLUMN_END_TIME)
+            );
+        }
+        updateTimeLine(id, endTime, true);
+        db.delete(TABLE_EVENTS, COLUMN_START_TIME + "=" + id, null);
+
+    }
+
+    /**
+     * Read event table for necessary info to draw bar chart
+     * @return An array contains event ID, start time and end time of the event
+     *         the first position represents the number of events
+     */
     public int[] readForBarCharts() {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -191,6 +286,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return array;
     }
 
+    /**
+     * Read event database for all events
+     * @return An arrayList of events
+     */
     public ArrayList<TravelEvent> readForEventList() {
         ArrayList<TravelEvent> events = new ArrayList<>();
 
@@ -239,7 +338,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return events;
     }
 
-
+    /**
+     * Read the timeLine table for available minutes
+     * @return An array of int represnets it that single minute is available
+     *         0 N/A
+     */
     public int[] readForTimeLine() {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -268,6 +371,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return array;
     }
 
+
+    /**
+     * clear all occupied time to available
+     */
     public void clearAll() {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -279,10 +386,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete(TABLE_EVENTS, null, null);
     }
 
+    /**
+     * Convert a DateTime object to minutes it represents
+     * @param dateTime
+     * @return
+     */
     private int dateTimeToInt(DateTime dateTime) {
         return dateTime.getHourOfDay() * 60 + dateTime.getMinuteOfHour();
     }
 
+    /**
+     * Initialize the timeLine table to all available
+     * @param db the database where the table is stored
+     */
     private void initTableLine(SQLiteDatabase db) {
         for (int i = 0; i < 1440; i++) {
             ContentValues values = new ContentValues();

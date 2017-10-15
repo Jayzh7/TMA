@@ -120,4 +120,7 @@
     <string name="meal">meal</string>
     <string name="guidance">guidance</string>
     <string name="others">others</string>
+    <string name="pie_chart_view">Pie chart view</string>
+    <string name="list_view">List view</string>
+    <string name="bar_chart_view">Bar chart view</string>
 </resources>

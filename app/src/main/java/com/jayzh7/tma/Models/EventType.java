@@ -5,6 +5,10 @@ package com.jayzh7.tma.Models;
  */
 
 public enum EventType {
-    SIGHTSEEING, GUIDANCE, MEAL,
-    REST, SHOPPING, OTHERS
+    SIGHTSEEING,
+    GUIDANCE,
+    MEAL,
+    REST,
+    SHOPPING,
+    OTHERS
 }

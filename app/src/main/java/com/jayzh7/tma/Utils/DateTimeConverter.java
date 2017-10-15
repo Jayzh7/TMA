@@ -38,4 +38,8 @@ public class DateTimeConverter {
                 return mHour + ":" + mMinute;
         }
     }
+
+    public int getMinutes() {
+        return mHour * 60 + mMinute;
+    }
 }
