@@ -79,7 +79,6 @@ public class BarBuffer extends AbstractBuffer<IBarDataSet> {
                     bottom *= phaseY;
 
                 addBar(left, top, right, bottom);
-
             } else {
 
                 float posY = 0f;

@@ -23,6 +23,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.jayzh7.tma.Database.DatabaseHelper;
+import com.jayzh7.tma.Models.EventType;
 import com.jayzh7.tma.Models.TravelEvent;
 import com.jayzh7.tma.R;
 import com.jayzh7.tma.Utils.MyPlacePicker;
@@ -40,13 +41,14 @@ public class AddEventActivity extends AppCompatActivity {
     private static final String sMissingInfo = "Please fill out all the blanks";
     private static final String sTimeConflict = "The time period that you've chosen is not available";
     private static final String sInvalidTime = "Please input valid start time and end time";
-    private EditText mEventName;
+    private EditText mEventNameET;
     private TextView mStartTimeTV;
     private TextView mEndTimeTV;
 
     private TextView mStartPlaceTV;
     private TextView mEndPlaceTV;
     private Spinner mSpinner;
+    private EventType mType;
 
     private MyTimePicker mStartTimePicker;
     private MyTimePicker mEndTimePicker;
@@ -69,7 +71,7 @@ public class AddEventActivity extends AppCompatActivity {
 
 
         mDB = DatabaseHelper.getInstance(this);
-
+        mType = EventType.SIGHTSEEING;
         LayoutInflater inflater = (LayoutInflater) thisActivity.getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popup_window, null);
         mPopupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -86,7 +88,7 @@ public class AddEventActivity extends AppCompatActivity {
         if (getIntent() == null)
             testInput();
         else
-            mEventName.setText("Not null");
+            mEventNameET.setText("Not null");
 
     }
 
@@ -97,7 +99,7 @@ public class AddEventActivity extends AppCompatActivity {
         mStartPlacePicker.testInput();
         mStartPlacePicker.testInput();
 
-        mEventName.setText("test");
+        mEventNameET.setText("test");
     }
 
     private void findViews() {
@@ -107,7 +109,7 @@ public class AddEventActivity extends AppCompatActivity {
         mStartPlaceTV = findViewById(R.id.startPlaceTV);
         mEndPlaceTV = findViewById(R.id.endPlaceTV);
         mLinearLayout = findViewById(R.id.linearLayout);
-        mEventName = findViewById(R.id.eventNameET);
+        mEventNameET = findViewById(R.id.eventNameET);
     }
 
     /**
@@ -132,11 +134,13 @@ public class AddEventActivity extends AppCompatActivity {
                     mEndPlacePicker.setBounds(latLngBounds);
                     mEndPlacePicker.setText(place.getName());
                     mEndPlacePicker.setPlaceID(place.getId());
+                    mEndPlacePicker.setPlaceName(place.getName().toString());
                     mStartPlacePicker.setBounds(latLngBounds);
                 } else {
                     mStartPlacePicker.setBounds(latLngBounds);
                     mStartPlacePicker.setText(place.getName());
                     mStartPlacePicker.setPlaceID(place.getId());
+                    mStartPlacePicker.setPlaceName(place.getName().toString());
                     mEndPlacePicker.setBounds(latLngBounds);
                 }
             } else if (resultCode == RESULT_CANCELED) {
@@ -167,16 +171,19 @@ public class AddEventActivity extends AppCompatActivity {
                         // save data to database
                         mDB.insertTravelEvent(
                                 new TravelEvent(
-                                        mEventName.getText().toString(),
+                                        mEventNameET.getText().toString(),
                                         mStartTimePicker.getDateTime(),
                                         mEndTimePicker.getDateTime(),
                                         mStartPlacePicker.getPlaceID(),
-                                        mEndPlacePicker.getPlaceID())
+                                        mEndPlacePicker.getPlaceID(),
+                                        mEndPlacePicker.getPlaceName(),
+                                        mStartPlacePicker.getPlaceName(),
+                                        EventType.valueOf(mSpinner.getSelectedItem().toString())
+                                )
                         );
                         this.finish();
                     } else {
                         mPopupText.setText(sTimeConflict);
-
                     }
                 } else {
                     mPopupText.setText(sInvalidTime);

@@ -228,6 +228,10 @@ public class BarEntry extends Entry {
         return mOffsetY;
     }
 
+    public int getID() {
+        return mID;
+    }
+
     /**
      * Returns the ranges of the individual stack-entries. Will return null if this entry is not stacked.
      *

@@ -6,12 +6,20 @@ import android.util.Log;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 
-//import com.jayzh7.tma.Database;
-
 public class HorizontalBarBuffer extends BarBuffer {
+
+    private int[] mBarId;
+    private float[][] mBarPos;
 
     public HorizontalBarBuffer(int size, int dataSetCount, boolean containsStacks) {
         super(size, dataSetCount, containsStacks);
+
+        mBarId = new int[60];
+        mBarPos = new float[60][4];
+    }
+
+    public float[][] getBarPos() {
+        return mBarPos;
     }
 
     @Override
@@ -20,16 +28,17 @@ public class HorizontalBarBuffer extends BarBuffer {
         float size = data.getEntryCount() * phaseX;
         float barWidthHalf = mBarWidth / 2f;
 
+        Log.d("HBB3", "out of for");
         for (int i = 0; i < size; i++) {
-
             BarEntry e = data.getEntryForIndex(i);
 
             if (e == null)
                 continue;
 
-            float x = e.getX(); // ID of the entry
+            float x = e.getX();
             float y = e.getY();
             float[] vals = e.getYVals();
+            int id = e.getID(); // ID of the entry
 
             if (!mContainsStacks || vals == null) {
 
@@ -52,11 +61,16 @@ public class HorizontalBarBuffer extends BarBuffer {
                     right *= phaseY;
                 else
                     left *= phaseY;
-                Log.d("HBB3", "ID:" + x + "LEFT:" + left + " TOP:" + top + " RIGHT:" + String.valueOf(right) + " BOTTOM:" + bottom);
+                Log.d("HBB3", "ID:" + id + "LEFT:" + left + " TOP:" + top + " RIGHT:" + String.valueOf(right) + " BOTTOM:" + bottom);
 
-                if (right > left)
+                // Don'r animate from zero to start
+                if (right > left) {
                     addBar(left, top, right, bottom);
-
+                    mBarPos[id][0] = left;
+                    mBarPos[id][1] = top;
+                    mBarPos[id][2] = right;
+                    mBarPos[id][3] = bottom;
+                }
             } else {
 
                 float posY = 0f;
@@ -96,7 +110,6 @@ public class HorizontalBarBuffer extends BarBuffer {
                 }
             }
         }
-
         reset();
     }
 }

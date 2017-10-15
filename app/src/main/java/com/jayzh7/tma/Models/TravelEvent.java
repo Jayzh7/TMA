@@ -7,12 +7,17 @@ import org.joda.time.DateTime;
  */
 
 public class TravelEvent {
-    private DateTime mStartTime = null;
-    private DateTime mEndTime = null;
-    private String mEventName = null;
+    private DateTime mStartTime;
+    private int mStartT;
+    private int mEndT;
+    private DateTime mEndTime;
+    private String mEventName;
     private Integer mDuration = -1;
     private String mStartPlaceID;
     private String mEndPlaceID;
+    private EventType mEventType;
+    private String mFromPlace;
+    private String mEndPlace;
 
     private static final String sPrefix = "origin=place_id:";
 
@@ -26,6 +31,34 @@ public class TravelEvent {
         mStartPlaceID = startPlaceID;
         mEndPlaceID = endPlaceID;
         calcDuration();
+    }
+
+    public TravelEvent(String name, DateTime start, DateTime end, String startPlaceId, String endPlaceId, String startPlace, String endPlace, EventType eventType) {
+        mEventName = name;
+        mStartTime = start;
+        mEndTime = end;
+        mStartPlaceID = startPlaceId;
+        mEndPlaceID = endPlaceId;
+        mFromPlace = startPlace;
+        mEndPlace = endPlace;
+        mEventType = eventType;
+        calcDuration();
+    }
+
+    public TravelEvent(String startPlace, String endPlace, DateTime startTime, DateTime endTime) {
+        mStartTime = startTime;
+        mEndTime = endTime;
+        mFromPlace = startPlace;
+        mEndPlace = endPlace;
+    }
+
+    public TravelEvent(String name, String startPlace, String endPlace, int startTime, int endTime, int eventType) {
+        mEventName = name;
+        mStartT = startTime;
+        mEndT = endTime;
+        mFromPlace = startPlace;
+        mEndPlace = endPlace;
+        mEventType = EventType.values()[eventType];
     }
 
     private void calcDuration() {
@@ -84,6 +117,26 @@ public class TravelEvent {
 
     public DateTime getEndTime() {
         return mEndTime;
+    }
+
+    public String getFromPlace() {
+        return mFromPlace;
+    }
+
+    public String getToPlace() {
+        return mEndPlace;
+    }
+
+    public int getStartT() {
+        return mStartT;
+    }
+
+    public int getEndT() {
+        return mEndT;
+    }
+
+    public EventType getEventType() {
+        return mEventType;
     }
 
     public Integer getDuration() {

@@ -40,6 +40,9 @@ public class HorizontalBarChart extends BarChart {
         super(context, attrs, defStyle);
     }
 
+    public HorizontalBarChartRenderer getHBCRenderer() {
+        return (HorizontalBarChartRenderer) mRenderer;
+    }
     @Override
     protected void init() {
 
@@ -51,6 +54,7 @@ public class HorizontalBarChart extends BarChart {
         mRightAxisTransformer = new TransformerHorizontalBarChart(mViewPortHandler);
 
         mRenderer = new HorizontalBarChartRenderer(this, mAnimator, mViewPortHandler);
+
         setHighlighter(new HorizontalBarHighlighter(this));
 
         mAxisRendererLeft = new YAxisRendererHorizontalBarChart(mViewPortHandler, mAxisLeft, mLeftAxisTransformer);

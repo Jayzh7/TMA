@@ -18,6 +18,7 @@ public class BarChartListener implements OnChartGestureListener {
 
     private Context mContext;
     private HorizontalBarChart mChart;
+//    private final static int[] height;
 
     public BarChartListener(Context context) {
         mContext = context;
@@ -45,9 +46,13 @@ public class BarChartListener implements OnChartGestureListener {
 
     @Override
     public void onChartDoubleTapped(MotionEvent me) {
+
         Intent intent = new Intent(mContext, AddEventActivity.class);
-        mContext.startActivity(intent);
+//        mContext.startActivity(intent);
+        Log.d("MYLOGTAG", "ONDOUBLETAP:" + me.getX() + " ," + me.getY());
+        Log.d("MYLOGTAG", "ONDOUBLETAP(RAW):" + me.getRawX() + " ," + me.getRawY());
     }
+
 
     @Override
     public void onChartSingleTapped(MotionEvent me) {

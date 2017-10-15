@@ -5,21 +5,17 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_chart"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/planning_journey" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_list"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/past_journey" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/weather_reminder" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
     </group>
 
     <item android:title="Communicate">

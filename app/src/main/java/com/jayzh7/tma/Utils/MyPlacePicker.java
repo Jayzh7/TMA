@@ -21,6 +21,7 @@ public class MyPlacePicker {
     private TextView mTextView;
     private LatLngBounds mBounds;
     private String mPlaceID;
+    private String mPlaceName;
     private boolean validity;
 
     public MyPlacePicker(Activity context, TextView textView, int code) {
@@ -35,6 +36,13 @@ public class MyPlacePicker {
         mTextView.setText(string);
     }
 
+    public void setPlaceName(String placeName) {
+        mPlaceName = placeName;
+    }
+
+    public String getPlaceName() {
+        return mPlaceName;
+    }
     public void testInput() {
         validity = true;
     }

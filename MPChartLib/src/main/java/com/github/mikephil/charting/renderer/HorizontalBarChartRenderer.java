@@ -43,14 +43,17 @@ public class HorizontalBarChartRenderer extends BarChartRenderer {
 
         BarData barData = mChart.getBarData();
         mBarBuffers = new HorizontalBarBuffer[barData.getDataSetCount()];
-
+        Log.d("MYLOGTAG", "buffer number" + barData.getDataSetCount());
         for (int i = 0; i < mBarBuffers.length; i++) {
             IBarDataSet set = barData.getDataSetByIndex(i);
             mBarBuffers[i] = new HorizontalBarBuffer(set.getEntryCount() * 4 * (set.isStacked() ? set.getStackSize() : 1),
                     barData.getDataSetCount(), set.isStacked());
         }
-
     }
+
+//    public HorizontalBarBuffer getBarBuffer(){
+//        return (HorizontalBarBuffer)mBarBuffers;
+//    }
 
     private RectF mBarShadowRectBuffer = new RectF();
 
@@ -121,7 +124,8 @@ public class HorizontalBarChartRenderer extends BarChartRenderer {
             mRenderPaint.setColor(dataSet.getColor());
         }
 
-        for (int j = 0; j < buffer.size(); j += 4) {
+        int j;
+        for (j = 0; j < buffer.size(); j += 4) {
 
             if (!mViewPortHandler.isInBoundsTop(buffer.buffer[j + 3]))
                 break;
@@ -143,6 +147,9 @@ public class HorizontalBarChartRenderer extends BarChartRenderer {
                         buffer.buffer[j + 3], mBarBorderPaint);
             }
         }
+        j -= 4;
+        int i = dataSet.getEntryCount();
+
     }
 
     @Override
@@ -427,4 +434,5 @@ public class HorizontalBarChartRenderer extends BarChartRenderer {
         return chart.getData().getEntryCount() < chart.getMaxVisibleCount()
                 * mViewPortHandler.getScaleY();
     }
+
 }

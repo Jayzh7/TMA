@@ -37,6 +37,10 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
     protected Paint mShadowPaint;
     protected Paint mBarBorderPaint;
 
+    public BarBuffer[] getBarBuffers() {
+        return mBarBuffers;
+    }
+
     public BarChartRenderer(BarDataProvider chart, ChartAnimator animator,
                             ViewPortHandler viewPortHandler) {
         super(animator, viewPortHandler);
@@ -81,6 +85,7 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 drawDataSet(c, set, i);
             }
         }
+
     }
 
     private RectF mBarShadowRectBuffer = new RectF();
@@ -481,9 +486,5 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
     @Override
     public void drawExtras(Canvas c) {
-    }
-
-    public BarBuffer[] getBuffer() {
-        return mBarBuffers;
     }
 }

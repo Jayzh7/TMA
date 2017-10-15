@@ -37,12 +37,11 @@ public class MyTimePicker {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                        mTextView.setText(hour + ":" + minute);
+                        mTextView.setText(new DateTimeConverter(hour, minute).getConvertedTime());
                         mTime = new DateTime(mTime.getYear(), mTime.getMonthOfYear(), mTime.getDayOfMonth(), hour, minute, 0, 0);
                     }
                 }, mTime.getHourOfDay(), mTime.getMinuteOfHour(), true);
                 validity = true;
-                timePickerDialog.setTitle("Select Time");
                 timePickerDialog.show();
             }
         });

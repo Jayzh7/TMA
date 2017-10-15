@@ -8,12 +8,8 @@
     tools:context="com.jayzh7.tma.Activities.NaviActivity"
     tools:showIn="@layout/app_bar_navi">
 
-
-    <com.github.mikephil.charting.charts.HorizontalBarChart
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/chart">
-
-    </com.github.mikephil.charting.charts.HorizontalBarChart>
-
+        android:id="@+id/content_frame" />
 </android.support.constraint.ConstraintLayout>
