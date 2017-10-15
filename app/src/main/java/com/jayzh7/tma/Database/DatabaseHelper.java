@@ -5,11 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.jayzh7.tma.Models.TravelEvent;
 
 import org.joda.time.DateTime;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -23,13 +24,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_AVAILABLE = "available";
     public static final String COLUMN_ID = "ID";
     public static final String COLUMN_EVENT_NAME = "EventName";
+    public static final String COLUMN_EVENT_TYPE = "EventType";
     public static final String COLUMN_END_TIME = "EndTime";
     public static final String COLUMN_START_TIME = "StartTime";
     public static final String COLUMN_DURATION = "Duration";
     public static final String COLUMN_START_PLACE_ID = "StartPlaceID";
     public static final String COLUMN_END_PLACE_ID = "EndPlaceID";
+    public static final String COLUMN_START_PLACE_NAME = "StartPlaceName";
+    public static final String COLUMN_END_PLACE_NAME = "EndPlaceName";
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 6;
     public static final String COLUMN_LEFT = "left";
     public static final String COLUMN_RIGHT = "right";
     public static final String COLUMN_TOP = "top";
@@ -67,19 +71,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_EVENT_NAME + " VARCHAR, "
                 + COLUMN_START_PLACE_ID + " VARCHAR, "
                 + COLUMN_END_PLACE_ID + " VARCHAR, "
+                + COLUMN_START_PLACE_NAME + " VARCHAR, "
+                + COLUMN_END_PLACE_NAME + " VARCAHR, "
                 + COLUMN_START_TIME + " INTEGER, "
                 + COLUMN_END_TIME + " INTEGER, "
-                + COLUMN_DURATION + " INTEGER, "
+                + COLUMN_EVENT_TYPE + " INTEGER, "
+                + COLUMN_DURATION + " INTEGER);");
+
+        /*
                 + COLUMN_LEFT + " INTEGER, "
                 + COLUMN_RIGHT + " INTEGER, "
                 + COLUMN_TOP + " INTEGER, "
-                + COLUMN_BOTTOM + " INTEGER);");
+                + COLUMN_BOTTOM + " INTEGER*/
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_TIME + " ( "
                 + COLUMN_ID + " INTEGER,"
                 + COLUMN_AVAILABLE + " INTEGER);");
 
-        Log.d("MYLOGTAG", " DB oncreate");
         initTableLine(sqLiteDatabase);
     }
 
@@ -100,9 +108,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_EVENT_NAME, travelEvent.getEventName());
         values.put(COLUMN_START_TIME, startTime);
         values.put(COLUMN_END_TIME, endTime);
+        values.put(COLUMN_START_PLACE_NAME, travelEvent.getFromPlace());
+        values.put(COLUMN_END_PLACE_NAME, travelEvent.getToPlace());
         values.put(COLUMN_DURATION, travelEvent.getDuration());
         values.put(COLUMN_START_PLACE_ID, travelEvent.getStartPlaceID());
         values.put(COLUMN_END_PLACE_ID, travelEvent.getEndPlaceID());
+        values.put(COLUMN_EVENT_TYPE, travelEvent.getEventType().ordinal());
 
 
         long id = database.insert(TABLE_EVENTS, null, values);
@@ -113,30 +124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String whereArgs = "";
         for (int i = 0; i < endTime - startTime; i++) {
             int j = database.update(TABLE_TIME, values1, COLUMN_ID + "=?", new String[]{String.valueOf(startTime + i)});
-            Log.d("MYLOGTAG", "Updated:" + String.valueOf(startTime + i) + " to value 0");
         }
-
-
-        //TODO delete debugging code
-//        String[] projection = {
-//                COLUMN_ID,
-//                COLUMN_START_TIME,
-//                COLUMN_END_TIME
-//        };
-//
-//        Cursor cursor = database.query(
-//                TABLE_EVENTS,
-//                projection,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//
-//        cursor.moveToNext();
-//        Log.d("MYLOGTAG", "DH " + cursor.getInt(
-//                cursor.getColumnIndexOrThrow(COLUMN_ID)));
 
         return id;
     }
@@ -160,7 +148,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_BOTTOM, bottom);
 
         int i = db.update(TABLE_EVENTS, values, COLUMN_ID + "=" + id, null);
-        Log.d("UPDATESQL", String.valueOf(i));
     }
 
     public int[] readForBarCharts() {
@@ -196,8 +183,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             array[index++] = id;
             array[index++] = startTime;
             array[index++] = endTime;
-
-            Log.d("MYLOGTAG", "Order, id = " + id + " " + startTime + " " + endTime);
         }
 
         // Stores the number of items
@@ -205,6 +190,55 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return array;
     }
+
+    public ArrayList<TravelEvent> readForEventList() {
+        ArrayList<TravelEvent> events = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] projection = {
+                COLUMN_EVENT_NAME,
+                COLUMN_START_TIME,
+                COLUMN_END_TIME,
+                COLUMN_START_PLACE_NAME,
+                COLUMN_END_PLACE_NAME,
+                COLUMN_EVENT_TYPE
+        };
+
+        String sortOrder = COLUMN_START_TIME + " ASC";
+
+        Cursor cursor = db.query(
+                TABLE_EVENTS,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+
+        while (cursor.moveToNext()) {
+            int startTime = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_START_TIME));
+            int endTime = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_END_TIME));
+            int type = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EVENT_TYPE));
+            String start = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_START_PLACE_NAME));
+            String end = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_END_PLACE_NAME));
+            DateTime currentTime = new DateTime();
+            events.add(new TravelEvent(
+                            cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EVENT_NAME)),
+                            start,
+                            end,
+                            startTime,
+                            endTime,
+                            type
+                    )
+            );
+
+        }
+
+        return events;
+    }
+
 
     public int[] readForTimeLine() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -229,7 +263,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             array[index++] = cursor.getInt(
                     cursor.getColumnIndexOrThrow(COLUMN_AVAILABLE)
             );
-            Log.d("MYLOGTAG", "read timeline array[" + String.valueOf(index - 1) + "] = " + array[index - 1]);
         }
 
         return array;
@@ -242,7 +275,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_AVAILABLE, 1);
 
         int i = db.update(TABLE_TIME, values, COLUMN_AVAILABLE + "=0", null);
-        Log.d("MYLOGTAG", "cleared" + i);
+
         db.delete(TABLE_EVENTS, null, null);
     }
 
