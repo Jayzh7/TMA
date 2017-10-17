@@ -1,4 +1,4 @@
-package com.jayzh7.tma.Utils;
+package com.jayzh7.tma.Adapter;
 
 import android.app.Activity;
 import android.view.View;

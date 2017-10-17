@@ -1,6 +1,7 @@
 package com.jayzh7.tma.Models;
 
 /**
+ * All event types
  * Created by Jay on 10/14/2017.
  */
 

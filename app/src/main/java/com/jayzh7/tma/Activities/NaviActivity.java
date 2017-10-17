@@ -1,6 +1,7 @@
 package com.jayzh7.tma.Activities;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,13 @@ import android.view.Window;
 import com.jayzh7.tma.Database.DatabaseHelper;
 import com.jayzh7.tma.R;
 
+/**
+ * Navigation activity that guides users to different fragment and activities.
+ *
+ * @author Jay
+ * @version 1.0
+ * @since 10/17/2017
+ */
 public class NaviActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -86,6 +94,13 @@ public class NaviActivity extends AppCompatActivity
                 fragment = new EventsListFragment();
                 title = "List";
                 break;
+            case R.id.nav_pie_chart:
+                fragment = new PieFragment();
+                title = "Pie Chart";
+                break;
+            case R.id.nav_weather:
+                fragment = new WeatherFragment();
+                title = "Weather Forecast";
         }
 
         if (fragment != null) {
@@ -100,5 +115,15 @@ public class NaviActivity extends AppCompatActivity
 
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent intent = new Intent(NaviActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

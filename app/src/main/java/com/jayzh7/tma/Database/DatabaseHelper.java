@@ -3,14 +3,23 @@ package com.jayzh7.tma.Database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.github.mikephil.charting.data.PieEntry;
 import com.jayzh7.tma.Models.TravelEvent;
 
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+
+import static com.jayzh7.tma.Models.EventType.GUIDANCE;
+import static com.jayzh7.tma.Models.EventType.MEAL;
+import static com.jayzh7.tma.Models.EventType.OTHERS;
+import static com.jayzh7.tma.Models.EventType.REST;
+import static com.jayzh7.tma.Models.EventType.SHOPPING;
+import static com.jayzh7.tma.Models.EventType.SIGHTSEEING;
 
 /**
  * This database helper is used to do all the read, write for database
@@ -19,9 +28,17 @@ import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "db";
+
     public static final String TABLE_EVENTS = "travel";
     public static final String TABLE_TIME = "time";
+    public static final String TABLE_DATE = "date";
+
     public static final String COLUMN_AVAILABLE = "available";
+
+    public static final String COLUMN_YEAR = "year";
+    public static final String COLUMN_MONTH = "month";
+    public static final String COLUMN_DAY = "day";
+
     public static final String COLUMN_ID = "ID";
     public static final String COLUMN_EVENT_NAME = "EventName";
     public static final String COLUMN_EVENT_TYPE = "EventType";
@@ -33,7 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_START_PLACE_NAME = "StartPlaceName";
     public static final String COLUMN_END_PLACE_NAME = "EndPlaceName";
 
-    public static final int DATABASE_VERSION = 7;
+    public static final int DATABASE_VERSION = 8;
     public static final String COLUMN_LEFT = "left";
     public static final String COLUMN_RIGHT = "right";
     public static final String COLUMN_TOP = "top";
@@ -74,6 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Create a new database upon creation.
+     *
      * @param sqLiteDatabase the database where data will be stored
      */
     @Override
@@ -100,6 +118,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_ID + " INTEGER,"
                 + COLUMN_AVAILABLE + " INTEGER);");
 
+        sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_DATE + " ( "
+                + COLUMN_YEAR + " INTEGER, "
+                + COLUMN_MONTH + " INTEGER, "
+                + COLUMN_DAY + " INTEGER);");
+
         initTableLine(sqLiteDatabase);
     }
 
@@ -107,11 +130,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENTS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_TIME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_DATE);
         onCreate(sqLiteDatabase);
     }
 
     /**
+     * Insert a date item to database
+     *
+     * @param year
+     * @param month month - 1
+     * @param day
+     */
+    public void insertDate(int year, int month, int day) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_YEAR, year);
+        values.put(COLUMN_MONTH, month + 1);
+        values.put(COLUMN_DAY, day);
+
+        db.insert(TABLE_DATE, null, values);
+    }
+
+    /**
+     * Update the date item
+     * Note: there is only one item in DATE table at any time
+     *
+     * @param year
+     * @param month month-1
+     * @param day
+     */
+    public void updateDate(int year, int month, int day) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_YEAR, year);
+        values.put(COLUMN_MONTH, month + 1);
+        values.put(COLUMN_DAY, day);
+
+        db.update(TABLE_DATE, values, null, null);
+    }
+    /**
      * Insert a new event to database
+     *
      * @param travelEvent new event
      * @return
      */
@@ -241,9 +302,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Get an event from database
+     *
+     * @param id start time of the event
+     * @return event
+     */
+    @Deprecated
+    public TravelEvent findEvent(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        TravelEvent event = new TravelEvent();
+
+        String[] projection = {
+                COLUMN_ID,
+                COLUMN_EVENT_NAME,
+                COLUMN_EVENT_TYPE,
+                COLUMN_END_TIME,
+                COLUMN_START_TIME,
+                COLUMN_START_PLACE_ID,
+                COLUMN_END_PLACE_ID,
+                COLUMN_START_PLACE_NAME,
+                COLUMN_END_PLACE_NAME
+        };
+
+        Cursor cursor = db.query(
+                TABLE_EVENTS,
+                projection,
+                COLUMN_START_TIME + "=" + id,
+                null,
+                null,
+                null,
+                null
+        );
+
+        return event;
+    }
+
+    /**
      * Read event table for necessary info to draw bar chart
+     *
      * @return An array contains event ID, start time and end time of the event
-     *         the first position represents the number of events
+     * the first position represents the number of events
      */
     public int[] readForBarCharts() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -286,8 +384,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return array;
     }
 
+    public int[] readForDate() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int[] date = new int[3];
+
+        String[] projection = {
+                COLUMN_YEAR,
+                COLUMN_MONTH,
+                COLUMN_DAY
+        };
+
+        Cursor cursor = db.query(
+                TABLE_DATE,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        cursor.moveToNext();
+        date[0] = cursor.getInt(
+                cursor.getColumnIndexOrThrow(COLUMN_YEAR));
+        date[1] = cursor.getInt(
+                cursor.getColumnIndexOrThrow(COLUMN_MONTH));
+        date[2] = cursor.getInt(
+                cursor.getColumnIndexOrThrow(COLUMN_DAY));
+
+        return date;
+    }
+
+    /**
+     * Get row count for events
+     *
+     * @return row count
+     */
+    public long getItemNumberForEvents() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        long cnt = DatabaseUtils.queryNumEntries(db, TABLE_EVENTS);
+        return cnt;
+    }
+
+    public long getItemNumberForDate() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return DatabaseUtils.queryNumEntries(db, TABLE_DATE);
+    }
+
+
     /**
      * Read event database for all events
+     *
      * @return An arrayList of events
      */
     public ArrayList<TravelEvent> readForEventList() {
@@ -339,9 +486,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Read data for Pie Chart
+     *
+     * @return Array list of event types and their count.
+     */
+    public ArrayList<PieEntry> readForPieChart() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        String[] labels = {SIGHTSEEING.toString(), GUIDANCE.toString(), MEAL.toString(),
+                REST.toString(), SHOPPING.toString(), OTHERS.toString()};
+        int[] cnt = {0, 0, 0, 0, 0, 0};
+
+        String[] projection = {
+                COLUMN_EVENT_TYPE,
+        };
+
+        Cursor cursor = db.query(
+                TABLE_EVENTS,
+                projection,
+                null, null, null, null, null);
+
+        while (cursor.moveToNext()) {
+            int temp = cursor.getInt(
+                    cursor.getColumnIndexOrThrow(COLUMN_EVENT_TYPE)
+            );
+            cnt[temp]++;
+        }
+
+        for (int i = 0; i < 6; i++) {
+            if (cnt[i] != 0) entries.add(new PieEntry(cnt[i], labels[i]));
+        }
+
+        return entries;
+    }
+
+    /**
      * Read the timeLine table for available minutes
+     *
      * @return An array of int represnets it that single minute is available
-     *         0 N/A
+     * 0 N/A
      */
     public int[] readForTimeLine() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -388,6 +571,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Convert a DateTime object to minutes it represents
+     *
      * @param dateTime
      * @return
      */
@@ -397,6 +581,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Initialize the timeLine table to all available
+     *
      * @param db the database where the table is stored
      */
     private void initTableLine(SQLiteDatabase db) {
@@ -404,8 +589,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(COLUMN_AVAILABLE, 1);
             values.put(COLUMN_ID, i);
-            long t = db.insert(TABLE_TIME, null, values);
+            db.insert(TABLE_TIME, null, values);
         }
     }
-
 }

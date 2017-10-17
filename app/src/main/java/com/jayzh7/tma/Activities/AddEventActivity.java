@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,21 +26,27 @@ import com.jayzh7.tma.Models.EventType;
 import com.jayzh7.tma.Models.TravelEvent;
 import com.jayzh7.tma.R;
 import com.jayzh7.tma.Utils.DateTimeConverter;
-import com.jayzh7.tma.Utils.MyPlacePicker;
-import com.jayzh7.tma.Utils.MyTimePicker;
-import com.jayzh7.tma.Utils.TravelEventAdapter;
+import com.jayzh7.tma.Adapter.MyPlacePicker;
+import com.jayzh7.tma.Adapter.MyTimePicker;
+import com.jayzh7.tma.Adapter.TravelEventAdapter;
 import com.jude.swipbackhelper.SwipeBackHelper;
 
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
+/**
+ * Activity for adding new events or updating existing events.
+ */
 public class AddEventActivity extends AppCompatActivity {
 
+    // Represents start place picker
     public static final int PLACE_PICKER_REQUEST_CODE_0 = 1;
+    // Represents end place picker
     public static final int PLACE_PICKER_REQUEST_CODE_1 = 2;
     public static final int MINUTES_IN_A_DAY = 1440;
 
+    // Warning messages for different warnings.
     private static final String sMissingInfo = "Please fill out all the blanks";
     private static final String sTimeConflict = "The time period that you've chosen is not available";
     private static final String sInvalidTime = "Please input valid start time and end time";
@@ -109,6 +114,11 @@ public class AddEventActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Set input for updating event.
+     *
+     * @param serializableExtra Object received from intent.
+     */
     private void setInput(Serializable serializableExtra) {
         TravelEvent event = (TravelEvent) serializableExtra;
 
@@ -129,6 +139,9 @@ public class AddEventActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Input test info
+     */
     private void testInput() {
         mStartTimePicker.testInput(10, 20);
         mEndTimePicker.testInput(10, 40);
@@ -168,12 +181,14 @@ public class AddEventActivity extends AppCompatActivity {
                 LatLngBounds latLngBounds = PlacePicker.getLatLngBounds(data);
 
                 if (requestCode == PLACE_PICKER_REQUEST_CODE_1) {
+                    // Result from EndPlacePicker
                     mEndPlacePicker.setBounds(latLngBounds);
                     mEndPlacePicker.setText(place.getName());
                     mEndPlacePicker.setPlaceID(place.getId());
                     mEndPlacePicker.setPlaceName(place.getName().toString());
                     mStartPlacePicker.setBounds(latLngBounds);
                 } else {
+                    // Result from StartPlacePicker
                     mStartPlacePicker.setBounds(latLngBounds);
                     mStartPlacePicker.setText(place.getName());
                     mStartPlacePicker.setPlaceID(place.getId());
@@ -181,7 +196,7 @@ public class AddEventActivity extends AppCompatActivity {
                     mEndPlacePicker.setBounds(latLngBounds);
                 }
             } else if (resultCode == RESULT_CANCELED) {
-                Log.i("MYLOGTAG", "Canceled");
+                // Nothing to do
             }
         }
     }

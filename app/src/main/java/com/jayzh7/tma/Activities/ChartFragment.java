@@ -25,9 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Jay on 10/14/2017.
+ * Fragment that shows the chart
+ * @author Jay
+ * @version 1.0
+ * @since 10/14/2017
  */
-
 public class ChartFragment extends android.support.v4.app.Fragment {
 
     public static final int sREQUEST_CODE = 1;
@@ -38,7 +40,9 @@ public class ChartFragment extends android.support.v4.app.Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.chart_fragment, container, false);
+        View v = inflater.inflate(R.layout.chart_fragment, container, false);
+        setHasOptionsMenu(true);
+        return v;
     }
 
     @Override
@@ -67,28 +71,11 @@ public class ChartFragment extends android.support.v4.app.Fragment {
         setChart();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up butto n, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        if (id == R.id.action_clear_all) {
-            mDB = DatabaseHelper.getInstance(getActivity());
-            mDB.clearAll();
-            setChart();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void setChart() {
+    /**
+     * Set all the attributes and data for bar chart.
+     */
+    public void setChart() {
         mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(false);
         mChart.getDescription().setEnabled(false);
@@ -114,6 +101,9 @@ public class ChartFragment extends android.support.v4.app.Fragment {
         l.setXEntrySpace(4f);
     }
 
+    /**
+     * Set data set for bar chart
+     */
     private void setData() {
         float barWidth = 1f;
         float spaceForBar = 1f;
@@ -175,4 +165,19 @@ public class ChartFragment extends android.support.v4.app.Fragment {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up butto n, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.action_clear_all) {
+            DatabaseHelper db = DatabaseHelper.getInstance(getActivity());
+            db.clearAll();
+            setChart();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

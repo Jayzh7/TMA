@@ -1,10 +1,12 @@
-package com.jayzh7.tma.Utils;
+package com.jayzh7.tma.Adapter;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import com.jayzh7.tma.Utils.DateTimeConverter;
 
 import org.joda.time.DateTime;
 

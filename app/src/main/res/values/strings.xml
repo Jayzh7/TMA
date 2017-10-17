@@ -123,4 +123,24 @@
     <string name="pie_chart_view">Pie chart view</string>
     <string name="list_view">List view</string>
     <string name="bar_chart_view">Bar chart view</string>
+    <string name="refresh">refresh</string>
+
+    <!-- Strings for weather -->
+    <string name="weather_sunny">&#xf00d;</string>
+    <string name="weather_clear_night">&#xf02e;</string>
+
+    <string name="weather_foggy">&#xf014;</string>
+    <string name="weather_cloudy">&#xf013;</string>
+    <string name="weather_rainy">&#xf019;</string>
+    <string name="weather_snowy">&#xf01b;</string>
+    <string name="weather_thunder">&#xf01e;</string>
+    <string name="weather_drizzle">&#xf01c;</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add">add</string>
+    <string name="click_to_choose_a_date">Click to choose a date</string>
+    <string name="reserved">Reserved</string>
+    <string name="weather_forecast">Weather forecast</string>
+    <string name="weather_app_id">reserved</string>
 </resources>
