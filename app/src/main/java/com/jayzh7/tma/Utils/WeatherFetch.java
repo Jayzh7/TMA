@@ -2,8 +2,6 @@ package com.jayzh7.tma.Utils;
 
 import android.content.Context;
 
-import com.jayzh7.tma.R;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,20 +13,33 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by Jay on 10/17/2017.
+ * Fetch data from open weather map api
+ * @author Jay
+ * @since 10/17/2017.
+ * @version 1.0
  */
-
 public class WeatherFetch {
-    private static final String OPEN_WEATHER_MAP_API =
-            "http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric";
+    private static final String sBaseUrl =
+            "http://api.openweathermap.org/data/2.5/forecast/daily?";
+    private static final String sAppId = "" +
+            "&appid=bd5e378503939ddaee76f12ad7a97608";
 
-    public static JSONObject getData(Context context, String city) {
+    private static final String sCod = "cod";
+
+    /**
+     * Get data from api
+     *
+     * @param context context from parent activity
+     * @param day     days from now
+     * @param lat     latitude of the place
+     * @param lon     longitude of the place
+     * @return JSONObject that contains the weather info
+     */
+    public static JSONObject getData(Context context, String day, String lat, String lon) {
         try {
-            URL url = new URL(String.format(OPEN_WEATHER_MAP_API, city));
+            URL url = new URL(sBaseUrl + "lat=" + lat + "&lon=" + lon + "&cnt=" + day + sAppId);
             HttpURLConnection connection =
                     (HttpURLConnection) url.openConnection();
-            connection.addRequestProperty("x-api-key",
-                    context.getString(R.string.weather_app_id));
 
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(connection.getInputStream()));
@@ -43,10 +54,9 @@ public class WeatherFetch {
 
             JSONObject data = new JSONObject(json.toString());
 
-            if (data.getInt("cod") != 200) {
+            if (data.getInt(sCod) != 200) {
                 return null;
             }
-
             return data;
         } catch (MalformedURLException e) {
             e.printStackTrace();

@@ -5,27 +5,39 @@ import org.joda.time.DateTime;
 import java.io.Serializable;
 
 /**
- * Created by Jay on 10/8/2017.
+ * Data model of travel event
+ * @author Jay
+ * @version 1.0
+ * @since 10/8/2017.
  */
-
 public class TravelEvent implements Serializable {
-    private DateTime mStartTime;
-    private int mStartT;
-    private int mEndT;
-    private DateTime mEndTime;
-    private String mEventName;
-    private Integer mDuration = -1;
-    private String mStartPlaceID;
-    private String mEndPlaceID;
-    private EventType mEventType;
-    private String mFromPlace;
-    private String mEndPlace;
+    private DateTime mStartTime; // Start time
+    private int mStartT;         // Start time in minutes
+    private int mEndT;           // End time in minutes
+    private DateTime mEndTime;   // End time
+    private String mEventName;   // Event name
+    private Integer mDuration = -1; // Duation of the event
+    private String mStartPlaceID;   // ID of the start place
+    private String mEndPlaceID;     // ID of the end place
+    private EventType mEventType;   // Event type
+    private String mFromPlace;      // Name of Start place
+    private String mEndPlace;       // Name of End place
 
     private static final String sPrefix = "origin=place_id:";
 
+    // Empty public constructor
     public TravelEvent() {
     }
 
+    /**
+     * Public constructor
+     *
+     * @param name         name of the event
+     * @param start        start time
+     * @param end          end time
+     * @param startPlaceID ID of the start place
+     * @param endPlaceID   ID of the end place
+     */
     public TravelEvent(String name, DateTime start, DateTime end, String startPlaceID, String endPlaceID) {
         mEventName = name;
         mStartTime = start;
@@ -56,10 +68,18 @@ public class TravelEvent implements Serializable {
         mEventType = EventType.values()[eventType];
     }
 
+    /**
+     * Calculate duration of the event
+     */
     private void calcDuration() {
         mDuration = millisToMinutes(mStartTime.getMillis() - mEndTime.getMillis());
     }
 
+    /**
+     * Convert milliseconds to minutes
+     * @param millis milliseconds
+     * @return minutes
+     */
     private int millisToMinutes(long millis) {
         return (int) (millis / 1000 / 60);
     }

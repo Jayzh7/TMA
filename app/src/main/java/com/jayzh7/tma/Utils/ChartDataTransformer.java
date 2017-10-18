@@ -2,10 +2,10 @@ package com.jayzh7.tma.Utils;
 
 /**
  * This class is used to transform data of time to appropriate bar chart data
- * <p>
- * Created by Jay on 10/8/2017.
+ * @author Jay
+ * @since 10/8/2017.
+ * @version 1.0
  */
-
 public class ChartDataTransformer {
 
     private int[] mChartData;
@@ -13,11 +13,20 @@ public class ChartDataTransformer {
     private int mMinTime;
     private int mMaxTime;
 
+    /**
+     * public constructor
+     *
+     * @param data the int array to be transformed
+     */
     public ChartDataTransformer(int[] data) {
         mChartData = data;
         mEntryData = data;
     }
 
+    /**
+     * Transforme data and return
+     * @return transformed data
+     */
     public int[] getTransformedData() {
         transform(mChartData);
         return mEntryData;
@@ -27,6 +36,10 @@ public class ChartDataTransformer {
         return mMinTime;
     }
 
+    /**
+     * Transform data so that the data set can be processed by bar chart.
+     * @param mChartData
+     */
     private void transform(int[] mChartData) {
         calcMinMax();
         for (int i = 2; i < mChartData[0]; i += 3) {
@@ -35,6 +48,9 @@ public class ChartDataTransformer {
         }
     }
 
+    /**
+     * Get the max value and minimum value
+     */
     private void calcMinMax() {
         mMinTime = 1440;
         mMaxTime = 0;
@@ -45,6 +61,10 @@ public class ChartDataTransformer {
         }
     }
 
+    /**
+     * Process a value
+     * @param num value
+     */
     private void calc(int num) {
         if (num < mMinTime) {
             mMinTime = num;

@@ -11,7 +11,10 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 
 /**
- * Created by Jay on 10/3/2017.
+ * A place picker used to get place input from users
+ * @author Jay
+ * @version 1.0
+ * @since 10/3/2017.
  */
 
 public class MyPlacePicker {
@@ -22,8 +25,16 @@ public class MyPlacePicker {
     private LatLngBounds mBounds;
     private String mPlaceID;
     private String mPlaceName;
+    // Check if it's set
     private boolean validity;
 
+    /**
+     * public constructor, initialize values
+     *
+     * @param context  context of parent activity
+     * @param textView bind view
+     * @param code     0 for start place, 1 for end place
+     */
     public MyPlacePicker(Activity context, TextView textView, int code) {
         mContext = context;
         mTextView = textView;

@@ -4,14 +4,81 @@
     android:layout_height="match_parent"
     tools:context="com.jayzh7.tma.Activities.WeatherFragment">
 
-    <TextView
-        android:id="@+id/dateTV"
+    <ProgressBar
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingTop="10dp"
-        android:text="@string/click_to_choose_a_date"
-        android:textSize="20sp" />
+        android:layout_height="match_parent"
+        android:id="@+id/progressBar"
+        android:visibility="gone" />
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <TextView
+            android:id="@+id/dateTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:text="@string/click_to_choose_a_date"
+            android:textSize="20sp" />
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/warning" />
+
+        <TextView
+            android:paddingTop="20dp"
+            android:gravity="center"
+            android:id="@+id/cityTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_city"
+            android:textColor="@color/primary"
+            android:textSize="20sp" />
+
+        <TextView
+            android:paddingTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tempTV"
+            android:gravity="center"
+            android:text="@string/sample_temp" />
+
+        <TextView
+            android:paddingTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:text="@string/summary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/summaryTV"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:text="@string/summary" />
+
+        <TextView
+            android:paddingTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:text="@string/wind_speed" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/windTV"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:text="@string/wind" />
+    </LinearLayout>
 </FrameLayout>

@@ -11,9 +11,11 @@ import com.jayzh7.tma.Utils.DateTimeConverter;
 import org.joda.time.DateTime;
 
 /**
- * Created by Jay on 10/3/2017.
+ * Time picker for time input
+ * @author Jay
+ * @version 1.0
+ * @since 10/3/2017.
  */
-
 public class MyTimePicker {
 
     private TextView mTextView;
@@ -21,6 +23,12 @@ public class MyTimePicker {
     private Context mContext;
     private boolean validity;
 
+    /**
+     * bind view and listener
+     *
+     * @param context  context of parent activity
+     * @param textView TextView that holds the value
+     */
     public MyTimePicker(Context context, TextView textView) {
         mContext = context;
         mTextView = textView;

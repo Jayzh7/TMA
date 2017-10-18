@@ -142,5 +142,18 @@
     <string name="click_to_choose_a_date">Click to choose a date</string>
     <string name="reserved">Reserved</string>
     <string name="weather_forecast">Weather forecast</string>
-    <string name="weather_app_id">reserved</string>
+    <string name="weather_app_id">9537cc925c81433c3538f4c4f2642a44</string>
+    <string name="dark_sky_id">29cfbdb909f7068c779fa15990e5299e</string>
+    <string name="warning">Can not fetch weather too far from now</string>
+    <string name="sample_city">Sydney</string>
+    <string name="sample_temp">20 C</string>
+    <string name="cant_get_data">Cannot fetch data!</string>
+    <string name="summary">Summary</string>
+    <string name="wind">Wind</string>
+    <string name="unknown_city">Unknown city</string>
+    <string name="wind_speed">wind speed</string>
+    <string name="chart_title">Chart</string>
+    <string name="list_title">List</string>
+    <string name="pie_title">Pie Chart</string>
+    <string name="weather_title">Weather Forecast</string>
 </resources>

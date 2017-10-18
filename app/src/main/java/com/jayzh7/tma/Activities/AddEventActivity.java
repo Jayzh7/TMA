@@ -21,14 +21,15 @@ import android.widget.TextView;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.jayzh7.tma.Adapter.MyPlacePicker;
+import com.jayzh7.tma.Adapter.MyTimePicker;
+import com.jayzh7.tma.Adapter.TravelEventAdapter;
 import com.jayzh7.tma.Database.DatabaseHelper;
 import com.jayzh7.tma.Models.EventType;
 import com.jayzh7.tma.Models.TravelEvent;
 import com.jayzh7.tma.R;
 import com.jayzh7.tma.Utils.DateTimeConverter;
-import com.jayzh7.tma.Adapter.MyPlacePicker;
-import com.jayzh7.tma.Adapter.MyTimePicker;
-import com.jayzh7.tma.Adapter.TravelEventAdapter;
+import com.jayzh7.tma.Utils.WeatherPreference;
 import com.jude.swipbackhelper.SwipeBackHelper;
 
 import org.joda.time.DateTime;
@@ -37,6 +38,9 @@ import java.io.Serializable;
 
 /**
  * Activity for adding new events or updating existing events.
+ * @author Jay
+ * @version 1.0
+ * @since 10/17/2017
  */
 public class AddEventActivity extends AppCompatActivity {
 
@@ -78,6 +82,13 @@ public class AddEventActivity extends AppCompatActivity {
     private boolean mNewEvent;
     private int mId;
 
+    /**
+     * Called when the activity is starting. Does most of the initialization.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down
+     *                           then this Bundle contains the data it most recently supplied in
+     *                           onSaveInstanceState
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SwipeBackHelper.onCreate(this);
@@ -148,10 +159,11 @@ public class AddEventActivity extends AppCompatActivity {
 
         mStartPlacePicker.testInput();
         mStartPlacePicker.testInput();
-
-        mEventNameET.setText("test");
     }
 
+    /**
+     * Bind views
+     */
     private void findViews() {
         mStartTimeTV = findViewById(R.id.startTimeTV);
         mEndTimeTV = findViewById(R.id.endTimeTV);
@@ -172,6 +184,15 @@ public class AddEventActivity extends AppCompatActivity {
         mSpinner.setAdapter(adapter);
     }
 
+    /**
+     * Process result from place pickers
+     *
+     * @param requestCode The integer request code originally supplied to startActivityForResult(),
+     *                    used to identify who this result came from.
+     * @param resultCode  The integer result code returned by the child activity through its setResult().
+     * @param data        An Intent, which can return result data to the caller
+     *                    (various data can be attached to Intent "extras").
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST_CODE_1 ||
@@ -194,6 +215,9 @@ public class AddEventActivity extends AppCompatActivity {
                     mStartPlacePicker.setPlaceID(place.getId());
                     mStartPlacePicker.setPlaceName(place.getName().toString());
                     mEndPlacePicker.setBounds(latLngBounds);
+
+                    new WeatherPreference(getApplicationContext()).setLongitude(String.valueOf(place.getLatLng().longitude));
+                    new WeatherPreference(getApplicationContext()).setLatitude(String.valueOf(place.getLatLng().latitude));
                 }
             } else if (resultCode == RESULT_CANCELED) {
                 // Nothing to do
@@ -201,6 +225,11 @@ public class AddEventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Inflate options menu
+     * @param menu the menu where option menu will be inflated
+     * @return true
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -208,6 +237,11 @@ public class AddEventActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * This is called whenever an item in options menu is selected.
+     * @param item The menu item that was selected
+     * @return super
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -216,14 +250,18 @@ public class AddEventActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.add_save) {
+            // Save data
             if (!mNewEvent) {
-                // Update event: delete old event and clear time line
+                // It is updating an event so delete old event and clear time line
                 mDB.deleteEvent(mId);
             }
 
+            // Check if all blanks are filled
             if (mStartPlacePicker.checkValidity() && mEndPlacePicker.checkValidity()
                     && mStartTimePicker.checkValidity() && mEndTimePicker.checkValidity()) {
+                // Check if input time make sense
                 if (getMinOfDateTime(mStartTimePicker.getDateTime()) < getMinOfDateTime(mEndTimePicker.getDateTime())) {
+                    // Check if time period is available
                     if (checkTimeValidity()) {
                         // save data to database
                         // Add a new event to database
@@ -239,7 +277,9 @@ public class AddEventActivity extends AppCompatActivity {
                                         EventType.valueOf(mSpinner.getSelectedItem().toString())
                                 )
                         );
+
                         this.finish();
+                        return true;
                     } else {
                         mPopupText.setText(sTimeConflict);
                     }
@@ -258,6 +298,10 @@ public class AddEventActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Dismiss the popup window
+     * @param v
+     */
     public void onClickCancel(View v) {
         mPopupWindow.dismiss();
     }
@@ -300,6 +344,11 @@ public class AddEventActivity extends AppCompatActivity {
         return available;
     }
 
+    /**
+     * Get minutes from a DateTime object
+     * @param dateTime to be converted
+     * @return minutes
+     */
     private int getMinOfDateTime(DateTime dateTime) {
         return dateTime.getHourOfDay() * 60 + dateTime.getMinuteOfHour();
     }

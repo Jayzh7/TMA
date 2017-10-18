@@ -33,10 +33,21 @@ import java.util.List;
 public class ChartFragment extends android.support.v4.app.Fragment {
 
     public static final int sREQUEST_CODE = 1;
-
+    private static final String sDataLabel = "Dataset 1";
     private HorizontalBarChart mChart;
     private DatabaseHelper mDB;
 
+    /**
+     * Inflate views and notify activity that option menu will be set
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment
+     * @param container          If non-null, this is the parent view that the fragment's UI should be
+     *                           attached to. The fragment should not add the view itself, but this can be
+     *                           used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous
+     *                           saved state as given here.
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -45,6 +56,13 @@ public class ChartFragment extends android.support.v4.app.Fragment {
         return v;
     }
 
+    /**
+     * Called immediately after onCreateView has returned, but before any saved state has been
+     * restored in to the view.
+     * @param view The View returned by onCreateView
+     * @param savedInstanceState  If non-null, this fragment is being re-constructed from a previous
+     *                           saved state as given here.
+     */
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
@@ -65,12 +83,14 @@ public class ChartFragment extends android.support.v4.app.Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
+    /**
+     * Refresh chart upon resume.
+     */
     @Override
     public void onResume() {
         super.onResume();
         setChart();
     }
-
 
     /**
      * Set all the attributes and data for bar chart.
@@ -151,7 +171,7 @@ public class ChartFragment extends android.support.v4.app.Fragment {
             mChart.getData().notifyDataChanged();
             mChart.notifyDataSetChanged();
         } else {
-            set = new BarDataSet(entries, "Dataset 1");
+            set = new BarDataSet(entries, sDataLabel);
 
             set.setDrawIcons(false);
 
@@ -165,6 +185,11 @@ public class ChartFragment extends android.support.v4.app.Fragment {
         }
     }
 
+    /**
+     * This is called whenever an item in options menu is selected.
+     * @param item The menu item that was selected
+     * @return super
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will

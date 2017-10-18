@@ -25,16 +25,32 @@ public class PieFragment extends Fragment {
 
     PieChart mChart;
 
+    /**
+     * Empty public constructor
+     */
     public PieFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Call super
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DatabaseHelper.getInstance(getActivity()).readForPieChart();
     }
 
+    /**
+     * Inflate views and notify activity that option menu will be set
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment
+     * @param container  If non-null, this is the parent view that the fragment's UI should be
+     *                   attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous
+     *                           saved state as given here.
+     * @return the view that's created
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -42,6 +58,10 @@ public class PieFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_pie, container, false);
     }
 
+    /**
+     * Does final initialization
+     * @param savedInstanceState not in use
+     */
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
